@@ -27,6 +27,22 @@ struct Triangle
     // The indices correspond to the std::vector of Vertices stored in the Polygon
     // which stores this Triangle
     unsigned int m_indices[3];
+
+    //Storing the pixel coordinates of the lower-left and
+    //upper-right vertices of the bounding box of the triangle
+    float xmin, ymin, xmax, ymax;
+
+    Triangle(unsigned int ind1, unsigned int ind2, unsigned int ind3,
+             float x1, float y1,
+             float x2, float y2)
+        :m_indices{ind1,ind2,ind3},
+          xmin(x1), ymin(y1),
+          xmax(x2), ymax(y2)
+    {}
+    Triangle()
+    {
+
+    }
 };
 
 class Polygon

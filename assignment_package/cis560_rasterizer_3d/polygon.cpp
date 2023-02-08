@@ -1,9 +1,27 @@
 #include "polygon.h"
 #include <glm/gtx/transform.hpp>
+#include <iostream>
 
 void Polygon::Triangulate()
 {
-    //TODO: Populate list of triangles
+    for(unsigned int i = 0; i < (this->m_verts.size())-2; i++)
+    {
+        //vertices
+        glm::vec4 v1 = (this->m_verts[0]).m_pos;
+        glm::vec4 v2 = (this->m_verts[i+1]).m_pos;
+        glm::vec4 v3 = (this->m_verts[i+2]).m_pos;
+
+        //bounding box calcns
+        float xmin = glm::min(v1[0],glm::min(v2[0],v3[0]));
+        float ymin = glm::min(v1[1],glm::min(v2[1],v3[1]));
+        float xmax = glm::max(v1[0],glm::max(v2[0],v3[0]));
+        float ymax = glm::max(v1[1],glm::max(v2[1],v3[1]));
+        //0,i+1,i+2 for the indices of the triangle
+        //x/y/max/min for the bounding box
+        this->m_tris.push_back(Triangle(0, i+1, i+2,
+                                        xmin, ymin>0.0f ? ymin:0.0f,
+                                        xmax, ymax<512.0f ?  ymax:511.0f));
+    }
 }
 
 glm::vec3 GetImageColor(const glm::vec2 &uv_coord, const QImage* const image)
@@ -23,6 +41,7 @@ glm::vec3 GetImageColor(const glm::vec2 &uv_coord, const QImage* const image)
 Polygon::Polygon(const QString& name, const std::vector<glm::vec4>& pos, const std::vector<glm::vec3>& col)
     : m_tris(), m_verts(), m_name(name), mp_texture(nullptr), mp_normalMap(nullptr)
 {
+
     for(unsigned int i = 0; i < pos.size(); i++)
     {
         m_verts.push_back(Vertex(pos[i], col[i], glm::vec4(), glm::vec2()));
@@ -45,6 +64,7 @@ Polygon::Polygon(const QString& name, int sides, glm::vec3 color, glm::vec4 pos,
                            * glm::scale(glm::vec3(scale.x, scale.y, scale.z))
                            * glm::rotate(i * angle, glm::vec3(0.f, 0.f, 1.f))
                            * v;
+
         m_verts.push_back(Vertex(vert_pos, color, glm::vec4(), glm::vec2()));
     }
 

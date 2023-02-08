@@ -133,9 +133,8 @@ void MainWindow::on_actionLoad_Scene_triggered()
             polygons.push_back(p);
         }
     }
-
     rasterizer = Rasterizer(polygons);
-
+    std::cout << "Entering rasterizer "<<std::endl;
     rendered_image = rasterizer.RenderScene();
     DisplayQImage(rendered_image);
 }

@@ -1,0 +1,17 @@
+https://stackoverflow.com/questions/8906545/how-to-initialize-a-vector-in-c
+
+https://stackoverflow.com/questions/47690386/initializing-array-of-stdvector-in-constructor-init-list
+
+
+https://stackoverflow.com/questions/2627166/what-is-the-difference-between-a-const-reference-and-normal-parameter
+
+https://stackoverflow.com/questions/2544394/c-floating-point-to-integer-type-conversions
+
+
+https://doc.qt.io/qt-6/qimage.html
+
+Struct error: https://stackoverflow.com/questions/30271811/c-error-no-matching-constructor-for-initialization-of
+
+TODO:
+The bounding box vertices are clamped at the edges of the image, but the intersection function will return points outside the box if the triangle is going out.
+Maybe perform a check that the intersection is in the image
