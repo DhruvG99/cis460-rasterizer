@@ -7,7 +7,7 @@ class Rasterizer
 {
 private:
     //This is the set of Polygons loaded from a JSON scene file
-    float zdepth[512*512];
+    std::vector<float> zdepth;
     std::vector<Polygon> m_polygons;
 public:
     Rasterizer(const std::vector<Polygon>& polygons);
@@ -23,12 +23,3 @@ public:
     void ClearScene();
 };
 
-/*
- * Flowchart for rasterizer
- * Iterate through all polygons: p
- * Iterate through the triangles in polygon p: t
- * Use bounding box for t
- * Iterate through rows of rasterizer
- * Look for intersection between horizontal and edges
- * Fill out triangle
- * */

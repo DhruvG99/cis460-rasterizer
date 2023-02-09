@@ -6,7 +6,7 @@
 #include <cmath>
 
 Rasterizer::Rasterizer(const std::vector<Polygon>& polygons)
-    :  zdepth{}, m_polygons(polygons)
+    :  zdepth(262144,FLT_MAX) , m_polygons(polygons)
 {}
 
 float Rasterizer::triangleArea(glm::vec4 p1, glm::vec4 p2, glm::vec4 p3) const
@@ -36,6 +36,10 @@ void Rasterizer::fillTriangle(unsigned int p, const struct Triangle& t, QImage* 
     Vertex v1 = poly.m_verts[t.m_indices[0]];
     Vertex v2 = poly.m_verts[t.m_indices[1]];
     Vertex v3 = poly.m_verts[t.m_indices[2]];
+    std::cout << "Vertices: " <<std::endl
+              << v1.m_pos[0] << ", " << v1.m_pos[1] << std::endl
+                 << v2.m_pos[0] << ", " << v2.m_pos[1] << std::endl
+                    << v3.m_pos[0] << ", " << v3.m_pos[1] << std::endl;
     //TODO:
     //>world coordinates-pixel conversion
     //triangle conversion to pixel for lineseg
@@ -101,7 +105,6 @@ void Rasterizer::fillPolygon(QImage* img)
 
 QImage Rasterizer::RenderScene()
 {
-//    std::cout << "Reached RenderScene"<<std::endl;
     QImage result(512, 512, QImage::Format_RGB32);
     // Fill the image with black pixels.
     // Note that qRgb creates a QColor,

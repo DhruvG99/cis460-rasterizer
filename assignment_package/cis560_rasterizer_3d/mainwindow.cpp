@@ -24,7 +24,6 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
     //editor. This one was implemented as a key press event for illustration purposes.
     case Qt::Key_Escape : on_actionQuit_Esc_triggered();  break;
     }
-
     rendered_image = rasterizer.RenderScene();
     DisplayQImage(rendered_image);
 }
@@ -55,7 +54,6 @@ void MainWindow::DisplayQImage(QImage &i)
 void MainWindow::on_actionLoad_Scene_triggered()
 {
     std::vector<Polygon> polygons;
-
     QString filename = QFileDialog::getOpenFileName(0, QString("Load Scene File"), QDir::currentPath().append(QString("../..")), QString("*.json"));
     int i = filename.length() - 1;
     while(QString::compare(filename.at(i), QChar('/')) != 0)
@@ -134,7 +132,6 @@ void MainWindow::on_actionLoad_Scene_triggered()
         }
     }
     rasterizer = Rasterizer(polygons);
-    std::cout << "Entering rasterizer "<<std::endl;
     rendered_image = rasterizer.RenderScene();
     DisplayQImage(rendered_image);
 }
