@@ -13,10 +13,10 @@ public:
     Rasterizer(const std::vector<Polygon>& polygons);
     float triangleArea(glm::vec4 p1, glm::vec4 p2, glm::vec4 p3) const;
     glm::vec3 baryInterp(glm::vec4 p, glm::vec4 p1, glm::vec4 p2, glm::vec4 p3) const;
-    //to fill a row
-//    void fillRow(float y_pos, float xl, float xr, Vertex v[3], QImage* img, QRgb val) const;
+
+    void findBounds(glm::vec4 v1, glm::vec4 v2, glm::vec4 v3, struct Triangle& t);
     //To color a triangle
-    void fillTriangle(unsigned int p, const struct Triangle& t, QImage* img);
+    void fillTriangle(unsigned int p, struct Triangle& t, QImage* img);
     //To color a polygon
     void fillPolygon(QImage* img);
     QImage RenderScene();
