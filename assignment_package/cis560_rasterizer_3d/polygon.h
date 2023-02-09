@@ -32,17 +32,17 @@ struct Triangle
     //upper-right vertices of the bounding box of the triangle
     float xmin, ymin, xmax, ymax;
 
-    Triangle(unsigned int ind1, unsigned int ind2, unsigned int ind3,
-             float x1, float y1,
-             float x2, float y2)
-        :m_indices{ind1,ind2,ind3},
-          xmin(x1), ymin(y1),
-          xmax(x2), ymax(y2)
-    {}
-    Triangle()
-    {
+//    Triangle(unsigned int ind1, unsigned int ind2, unsigned int ind3,
+//             float x1, float y1,
+//             float x2, float y2)
+//        :m_indices{ind1,ind2,ind3},
+//          xmin(x1), ymin(y1),
+//          xmax(x2), ymax(y2)
+//    {}
+//    Triangle()
+//    {
 
-    }
+//    }
 };
 
 class Polygon
@@ -72,7 +72,6 @@ public:
     // TODO: Complete the body of Triangulate() in polygon.cpp
     // Creates a set of triangles that, when combined, fill the area of this convex polygon.
     void Triangulate();
-
     // Copies the input QImage into this Polygon's texture
     void SetTexture(QImage*);
 
@@ -81,7 +80,7 @@ public:
 
     // Various getter, setter, and adder functions
     void AddVertex(const Vertex&);
-    void AddTriangle(const Triangle&);
+    void AddTriangle(Triangle&);
     void ClearTriangles();
 
     Triangle& TriAt(unsigned int);

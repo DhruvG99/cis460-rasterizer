@@ -6,21 +6,12 @@ void Polygon::Triangulate()
 {
     for(unsigned int i = 0; i < (this->m_verts.size())-2; i++)
     {
+        Triangle t;
         //vertices
-        glm::vec4 v1 = (this->m_verts[0]).m_pos;
-        glm::vec4 v2 = (this->m_verts[i+1]).m_pos;
-        glm::vec4 v3 = (this->m_verts[i+2]).m_pos;
-
-        //bounding box calcns
-        float xmin = glm::min(v1[0],glm::min(v2[0],v3[0]));
-        float ymin = glm::min(v1[1],glm::min(v2[1],v3[1]));
-        float xmax = glm::max(v1[0],glm::max(v2[0],v3[0]));
-        float ymax = glm::max(v1[1],glm::max(v2[1],v3[1]));
-        //0,i+1,i+2 for the indices of the triangle
-        //x/y/max/min for the bounding box
-        this->m_tris.push_back(Triangle(0, i+1, i+2,
-                                        xmin, ymin>0.0f ? ymin:0.0f,
-                                        xmax, ymax<512.0f ?  ymax:511.0f));
+        t.m_indices[0] = 0;
+        t.m_indices[1] = i+1;
+        t.m_indices[2] = i+2;
+        this->AddTriangle(t);
     }
 }
 
@@ -107,8 +98,21 @@ void Polygon::SetNormalMap(QImage* i)
     mp_normalMap = i;
 }
 
-void Polygon::AddTriangle(const Triangle& t)
+void Polygon::AddTriangle(Triangle& t)
 {
+    glm::vec4 v1 = (this->m_verts[t.m_indices[0]]).m_pos;
+    glm::vec4 v2 = (this->m_verts[t.m_indices[1]]).m_pos;
+    glm::vec4 v3 = (this->m_verts[t.m_indices[2]]).m_pos;
+
+    float xmin = glm::min(v1[0],glm::min(v2[0],v3[0]));
+    float ymin = glm::min(v1[1],glm::min(v2[1],v3[1]));
+    float xmax = glm::max(v1[0],glm::max(v2[0],v3[0]));
+    float ymax = glm::max(v1[1],glm::max(v2[1],v3[1]));
+    t.xmin = xmin;
+    t.xmax = xmax;
+    t.ymin = ymin>0.0f ? ymin:0.0f;
+    t.ymax = ymax<512.0f ?  ymax:511.0f;
+
     m_tris.push_back(t);
 }
 

@@ -12,6 +12,7 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
+    camera.cpp \
     lineseg.cpp \
         mainwindow.cpp \
     polygon.cpp \
@@ -19,6 +20,7 @@ SOURCES += main.cpp\
     tiny_obj_loader.cc
 
 HEADERS  += mainwindow.h \
+    camera.h \
     lineseg.h \
     polygon.h \
     rasterizer.h \

@@ -4,6 +4,7 @@
 #include <glm/gtx/string_cast.hpp>
 #include <iostream>
 #include <cmath>
+#include <camera.h>
 
 Rasterizer::Rasterizer(const std::vector<Polygon>& polygons)
     :  zdepth(262144,FLT_MAX) , m_polygons(polygons)
@@ -29,17 +30,12 @@ glm::vec3 Rasterizer::baryInterp(glm::vec4 p, glm::vec4 p1, glm::vec4 p2, glm::v
     return coeff;
 }
 
-//to be modified for multiple polygons
 void Rasterizer::fillTriangle(unsigned int p, const struct Triangle& t, QImage* img)
 {
     Polygon poly = this->m_polygons[p];
     Vertex v1 = poly.m_verts[t.m_indices[0]];
     Vertex v2 = poly.m_verts[t.m_indices[1]];
     Vertex v3 = poly.m_verts[t.m_indices[2]];
-    std::cout << "Vertices: " <<std::endl
-              << v1.m_pos[0] << ", " << v1.m_pos[1] << std::endl
-                 << v2.m_pos[0] << ", " << v2.m_pos[1] << std::endl
-                    << v3.m_pos[0] << ", " << v3.m_pos[1] << std::endl;
     //TODO:
     //>world coordinates-pixel conversion
     //triangle conversion to pixel for lineseg
@@ -51,8 +47,6 @@ void Rasterizer::fillTriangle(unsigned int p, const struct Triangle& t, QImage* 
     //ensure we only search rows in bounding box
     int y_min = floor(t.ymin);
     int y_max = ceil(t.ymax);
-    std::cout << "Y Bounds: " << t.ymin << ", " << t.ymax <<std::endl;
-    std::cout << "X Bounds: " << t.xmin << ", " << t.xmax <<std::endl;
     for(int row = y_min; row<y_max; row++)
     {
         float xLeft = 512.0f, xRight = 0.0f;
@@ -77,7 +71,7 @@ void Rasterizer::fillTriangle(unsigned int p, const struct Triangle& t, QImage* 
         //dangerous stuff, using float as a counter
         for(float xcoord = xLeft; xcoord<xRight; xcoord++)
         {
-            //zdepth[floor(xcoord + 512.0f*row)] = ;
+//            img->setPixel(xcoord, row, qRgb(255.0f,255.0f,255.0f));
             float zp = v1.m_pos[2];
             if(zp < this->zdepth[floor(xcoord + 512.0f*row)])
             {
@@ -95,14 +89,22 @@ void Rasterizer::fillTriangle(unsigned int p, const struct Triangle& t, QImage* 
 
 void Rasterizer::fillPolygon(QImage* img)
 {
-
+//    Camera c;
     for(unsigned int i = 0; i<this->m_polygons.size(); i++)
     {
         Polygon p = m_polygons[i];
+//        for(unsigned int v=0; v<p.m_verts.size(); v++)
+//        {
+//            Vertex vert = p.m_verts[v];
+//            vert.m_pos = c.projMat()*c.viewMat()*vert.m_pos;
+//            vert.m_pos = vert.m_pos/vert.m_pos[3];
+//            vert.m_pos[0] = 0.5*(vert.m_pos[0]+1.0f)*512.0f;
+//            vert.m_pos[1] = 0.5*(1.0f-vert.m_pos[1])*512.0f;
+//            std::cout<<"Vertex: "<<vert.m_pos[0]<<", "<<vert.m_pos[1]<<std::endl;
+//        }
         std::cout << p.m_name.toStdString() << std::endl;
         for(unsigned int j=0; j<p.m_tris.size(); j++)
         {
-            std::cout << "Triangle No.: " << j << std::endl;
             fillTriangle(i, p.m_tris[j], img);
         }
     }
