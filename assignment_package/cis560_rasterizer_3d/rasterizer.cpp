@@ -30,7 +30,7 @@ glm::vec3 Rasterizer::baryInterp(glm::vec4 p, glm::vec4 p1, glm::vec4 p2, glm::v
 }
 
 //to be modified for multiple polygons
-void Rasterizer::fillTriangle(unsigned int p, const struct Triangle& t, QImage* img) const
+void Rasterizer::fillTriangle(unsigned int p, const struct Triangle& t, QImage* img)
 {
     Polygon poly = this->m_polygons[p];
     Vertex v1 = poly.m_verts[t.m_indices[0]];
@@ -78,11 +78,16 @@ void Rasterizer::fillTriangle(unsigned int p, const struct Triangle& t, QImage* 
         for(float xcoord = xLeft; xcoord<xRight; xcoord++)
         {
             //zdepth[floor(xcoord + 512.0f*row)] = ;
-            glm::vec4 v(xcoord, static_cast<float>(row), 0.0f, 1.0f);
-            glm::vec3 coeff = baryInterp(v ,v1.m_pos, v2.m_pos, v3.m_pos);
-            glm::vec3 cvec = coeff[0]*v1.m_color + coeff[1]*v2.m_color + coeff[2]*v3.m_color;
-            QRgb cval = qRgb(cvec[0],cvec[1],cvec[2]);
-            img->setPixel(xcoord, row, cval);
+            float zp = v1.m_pos[2];
+            if(zp < this->zdepth[floor(xcoord + 512.0f*row)])
+            {
+                zdepth[floor(xcoord + 512.0f*row)] = zp;
+                glm::vec4 v(xcoord, static_cast<float>(row), 0.0f, 1.0f);
+                glm::vec3 coeff = baryInterp(v ,v1.m_pos, v2.m_pos, v3.m_pos);
+                glm::vec3 cvec = coeff[0]*v1.m_color + coeff[1]*v2.m_color + coeff[2]*v3.m_color;
+                QRgb cval = qRgb(cvec[0],cvec[1],cvec[2]);
+                img->setPixel(xcoord, row, cval);
+            }
         }
     }
 

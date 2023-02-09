@@ -16,7 +16,7 @@ public:
     //to fill a row
 //    void fillRow(float y_pos, float xl, float xr, Vertex v[3], QImage* img, QRgb val) const;
     //To color a triangle
-    void fillTriangle(unsigned int p, const struct Triangle& t, QImage* img) const;
+    void fillTriangle(unsigned int p, const struct Triangle& t, QImage* img);
     //To color a polygon
     void fillPolygon(QImage* img);
     QImage RenderScene();
