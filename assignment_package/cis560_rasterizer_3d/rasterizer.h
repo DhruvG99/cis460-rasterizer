@@ -27,7 +27,7 @@ public:
     void PixelToWorld();
     //Used to convert all vertices of the polygon to Pixel Coordinates
     void WorldToPixel();
-    //Used to calculate Camera coordinates for barycentric interp
+    //Used to calculate Camera coordinates for barycentric interp, single vertex
     glm::vec4 PixelToCamera(glm::vec4);
     //To color a polygon
     void fillPolygon(QImage* img);

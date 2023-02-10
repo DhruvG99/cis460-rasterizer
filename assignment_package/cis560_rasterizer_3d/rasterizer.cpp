@@ -85,24 +85,25 @@ void Rasterizer::fillTriangle(unsigned int p, struct Triangle& t, QImage* img)
         //to avoid black lines
         for(float xcoord = xLeft; xcoord<xRight; xcoord++)
         {
+            //Current pixel
             glm::vec4 v(xcoord, static_cast<float>(row), 0.0f, 1.0f);
+            //barycentric coefficients
             glm::vec3 coeff = baryInterp(v ,v1.m_pos, v2.m_pos, v3.m_pos);
+
             glm::vec4 v1_world = PixelToCamera(v1.m_pos);
             glm::vec4 v2_world = PixelToCamera(v2.m_pos);
             glm::vec4 v3_world = PixelToCamera(v3.m_pos);
+            //interpolated z coordinate
             float zlerp = 1.0f/((coeff[0]/v1_world[2]) + (coeff[0]/v2_world[2]) + (coeff[0]/v3_world[2]));
+            //interpolating for uv coordinate
             glm::vec2 uv1 = v1.m_uv;
             glm::vec2 uv2 = v2.m_uv;
             glm::vec2 uv3 = v3.m_uv;
             glm::vec2 uv_p = uv1*coeff[0] + uv2*coeff[1] + uv3*coeff[2];
-
+            //using interpd uv coord to get texture
             glm::vec3 cvec = GetImageColor(uv_p, poly.mp_texture);
 
-//            glm::vec3 cvec =
-//                    zlerp*((coeff[0]*v1.m_color/v1_world[2]) +
-//                    (coeff[1]*v2.m_color/v2_world[2])+
-//                    (coeff[2]*v3.m_color/v3_world[2]));
-
+            //z-buffering. worked for 2-D but not so sure about 3D
             if(zlerp < this->zdepth[floor(xcoord + 512.0f*row)])
             {
                 zdepth[floor(xcoord + 512.0f*row)] = zlerp;
@@ -110,7 +111,6 @@ void Rasterizer::fillTriangle(unsigned int p, struct Triangle& t, QImage* img)
                 img->setPixel(xcoord, row, cval);
             }
         }
-
     }
 
 }
@@ -175,24 +175,11 @@ void Rasterizer::fillPolygon(QImage* img)
 QImage Rasterizer::RenderScene()
 {
     QImage result(512, 512, QImage::Format_RGB32);
-    // Fill the image with black pixels.
-    // Note that qRgb creates a QColor,
-    // and takes in values [0, 255] rather than [0, 1].
     result.fill(qRgb(0.f, 0.f, 0.f));
-    // TODO: Complete the various components of code that make up this function.
-    // It should return the rasterized image of the current scene.
+    //to fix z-buffering issues when using key-presses. need to reinitialize
     zdepth = std::vector(262144,FLT_MAX);
+    //main function call to trigger rasterization
     fillPolygon(&result);
-    // Make liberal use of helper functions; writing your rasterizer as one
-    // long RenderScene function will make it (a) hard to debug and
-    // (b) hard to write without copy-pasting. Also, Adam will be sad when
-    // he reads your code.
-
-    // Also! As per the style requirements for this assignment, make sure you
-    // use std::arrays to store things like your line segments, Triangles, and
-    // vertex coordinates. This lets you easily use loops to perform operations
-    // on your scene components, rather than copy-pasting operations three times
-    // each!
     return result;
 }
 

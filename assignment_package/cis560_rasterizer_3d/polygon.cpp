@@ -108,6 +108,7 @@ void Polygon::AddTriangle(Triangle& t)
     float ymin = glm::min(v1[1],glm::min(v2[1],v3[1]));
     float xmax = glm::max(v1[0],glm::max(v2[0],v3[0]));
     float ymax = glm::max(v1[1],glm::max(v2[1],v3[1]));
+    //Adding the bounds while adding the triangle
     t.xmin = xmin;
     t.xmax = xmax;
     t.ymin = ymin>0.0f ? ymin:0.0f;

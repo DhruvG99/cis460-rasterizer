@@ -9,7 +9,6 @@ class Lineseg
 {
 public:
     //vectors storing segment's endpoints
-    //TODO: glm::vec4
     glm::vec4 p1;
     glm::vec4 p2;
 
