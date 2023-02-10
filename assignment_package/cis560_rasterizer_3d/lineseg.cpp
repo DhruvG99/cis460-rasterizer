@@ -18,13 +18,13 @@ bool Lineseg::getIntersection(int y, float* x) const
     float yf =static_cast<float>(y);
     if(this->p1[0] == this->p2[0]) // vertical edge
     {
+        //checks to make sure intersection is only on segment
         if((yf<=p1[1] && yf>=p2[1]) || (yf>=p1[1] && yf<=p2[1]))
         {
             *x = p1[0];
             return true;
         }
     }
-    //TODO: y == seg1.y == seg2.y
     else if(this->p1[1] == this->p2[1]) // horizontal edge
         return false; //since the other  two edges will return an intersection
     else //all other cases - oblique

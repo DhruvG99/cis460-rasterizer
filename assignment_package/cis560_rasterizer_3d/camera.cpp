@@ -1,6 +1,7 @@
 #include "camera.h"
 #include <math.h>
-
+#include <iostream>
+# define M_PI           3.14159265358979323846
 Camera::Camera()
     : forwardZ(0.0f, 0.0f, -1.0f, 0.0f), rightX(1.0f, 0.0f, 0.0f, 0.0f), upY(0.0f, 1.0f, 0.0f, 0.0f),
       fov(45.0f), camPos(0.0f, 0.0f, 10.0f, 1.0f),
@@ -58,6 +59,7 @@ void Camera::translateY(float y)
 
 void Camera::rotateZ(float rot)
 {
+    rot = rot*(M_PI/180.0f);
     glm::vec3 z(forwardZ);
     glm::vec3 x(rightX);
     glm::vec3 y(upY);
@@ -67,19 +69,21 @@ void Camera::rotateZ(float rot)
 
 void Camera::rotateX(float rot)
 {
+    rot = rot*(M_PI/180.0f);
     glm::vec3 z(forwardZ);
     glm::vec3 x(rightX);
     glm::vec3 y(upY);
-    forwardZ = glm::vec4(z*cos(rot) + glm::cross(x,z)*sin(rot) + z*glm::dot(x,z)*(1-cos(rot)), 0.0f);
-    upY = glm::vec4(y*cos(rot) + glm::cross(x,y)*sin(rot) + z*glm::dot(x,y)*(1-cos(rot)), 0.0f);
+    forwardZ = glm::vec4(z*cos(rot) + glm::cross(x,z)*sin(rot) + x*glm::dot(x,z)*(1-cos(rot)), 0.0f);
+    upY = glm::vec4(y*cos(rot) + glm::cross(x,y)*sin(rot) + x*glm::dot(x,y)*(1-cos(rot)), 0.0f);
 }
 
 void Camera::rotateY(float rot)
 {
+    rot = rot*(M_PI/180.0f);
     glm::vec3 z(forwardZ);
     glm::vec3 x(rightX);
     glm::vec3 y(upY);
-    rightX = glm::vec4(x*cos(rot) + glm::cross(y,x)*sin(rot) + z*glm::dot(y,x)*(1-cos(rot)), 0.0f);
-    forwardZ = glm::vec4(z*cos(rot) + glm::cross(y,z)*sin(rot) + z*glm::dot(y,z)*(1-cos(rot)), 0.0f);
+    rightX = glm::vec4(x*cos(rot) + glm::cross(y,x)*sin(rot) + y*glm::dot(y,x)*(1-cos(rot)), 0.0f);
+    forwardZ = glm::vec4(z*cos(rot) + glm::cross(y,z)*sin(rot) + y*glm::dot(y,z)*(1-cos(rot)), 0.0f);
 }
 

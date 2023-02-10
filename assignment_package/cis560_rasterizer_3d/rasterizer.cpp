@@ -4,11 +4,13 @@
 #include <glm/gtx/string_cast.hpp>
 #include <iostream>
 #include <cmath>
-#include <camera.h>
 
 Rasterizer::Rasterizer(const std::vector<Polygon>& polygons)
-    :  zdepth(262144,FLT_MAX) , m_polygons(polygons)
-{}
+    :  zdepth(262144,FLT_MAX) , m_polygons(polygons), c()
+{
+    //Done while initalizing the rasterizer
+    WorldToPixel();
+}
 
 float Rasterizer::triangleArea(glm::vec4 p1, glm::vec4 p2, glm::vec4 p3) const
 {
@@ -49,11 +51,6 @@ void Rasterizer::fillTriangle(unsigned int p, struct Triangle& t, QImage* img)
     Vertex v2 = poly.m_verts[t.m_indices[1]];
     Vertex v3 = poly.m_verts[t.m_indices[2]];
     findBounds(v1.m_pos,v2.m_pos,v3.m_pos,t);
-//    std::cout<<"Vertex: "<<v1.m_pos[0]<<", "<<v1.m_pos[1]<<", "<<v1.m_pos[2]<<std::endl;
-    //TODO:
-    //>world coordinates-pixel conversion
-    //triangle conversion to pixel for lineseg
-    //>find bounds here
     Lineseg lines[] = {Lineseg(v1.m_pos,v2.m_pos),
                      Lineseg(v2.m_pos,v3.m_pos),
                      Lineseg(v3.m_pos,v1.m_pos)};
@@ -85,45 +82,89 @@ void Rasterizer::fillTriangle(unsigned int p, struct Triangle& t, QImage* img)
 
         //fill between xLeft and xRight
         //dangerous stuff, using float as a counter
+        //to avoid black lines
         for(float xcoord = xLeft; xcoord<xRight; xcoord++)
         {
-            img->setPixel(xcoord, row, qRgb(255.0f,255.0f,255.0f));
-//            float zp = v1.m_pos[2];
-//            if(zp < this->zdepth[floor(xcoord + 512.0f*row)])
-//            {
-//                zdepth[floor(xcoord + 512.0f*row)] = zp;
-//                glm::vec4 v(xcoord, static_cast<float>(row), 0.0f, 1.0f);
-//                glm::vec3 coeff = baryInterp(v ,v1.m_pos, v2.m_pos, v3.m_pos);
-//                glm::vec3 cvec = coeff[0]*v1.m_color + coeff[1]*v2.m_color + coeff[2]*v3.m_color;
-//                QRgb cval = qRgb(cvec[0],cvec[1],cvec[2]);
-//                img->setPixel(xcoord, row, cval);
-//            }
+            glm::vec4 v(xcoord, static_cast<float>(row), 0.0f, 1.0f);
+            glm::vec3 coeff = baryInterp(v ,v1.m_pos, v2.m_pos, v3.m_pos);
+            glm::vec4 v1_world = PixelToCamera(v1.m_pos);
+            glm::vec4 v2_world = PixelToCamera(v2.m_pos);
+            glm::vec4 v3_world = PixelToCamera(v3.m_pos);
+            float zlerp = 1.0f/((coeff[0]/v1_world[2]) + (coeff[0]/v2_world[2]) + (coeff[0]/v3_world[2]));
+            glm::vec2 uv1 = v1.m_uv;
+            glm::vec2 uv2 = v2.m_uv;
+            glm::vec2 uv3 = v3.m_uv;
+            glm::vec2 uv_p = uv1*coeff[0] + uv2*coeff[1] + uv3*coeff[2];
+
+            glm::vec3 cvec = GetImageColor(uv_p, poly.mp_texture);
+
+//            glm::vec3 cvec =
+//                    zlerp*((coeff[0]*v1.m_color/v1_world[2]) +
+//                    (coeff[1]*v2.m_color/v2_world[2])+
+//                    (coeff[2]*v3.m_color/v3_world[2]));
+
+            if(zlerp < this->zdepth[floor(xcoord + 512.0f*row)])
+            {
+                zdepth[floor(xcoord + 512.0f*row)] = zlerp;
+                QRgb cval = qRgb(cvec[0],cvec[1],cvec[2]);
+                img->setPixel(xcoord, row, cval);
+            }
         }
+
     }
 
 }
 
+void Rasterizer::WorldToPixel()
+{
+    for(Polygon& p: this->m_polygons)
+    {
+        for(unsigned int v=0; v<p.m_verts.size(); v++)
+        {
+            Vertex vert = p.m_verts[v];
+            vert.m_pos = c.projMat()*c.viewMat()*vert.m_pos;
+            vert.m_pos = vert.m_pos/vert.m_pos[3];
+            vert.m_pos[0] = 0.5f*(vert.m_pos[0]+1.0f)*512.0f;
+            vert.m_pos[1] = 0.5f*(1.0f-vert.m_pos[1])*512.0f;
+
+            p.m_verts[v] = vert;
+        }
+    }
+}
+
+void Rasterizer::PixelToWorld()
+{
+    for(Polygon& p: this->m_polygons)
+    {
+        for(unsigned int v=0; v<p.m_verts.size(); v++)
+        {
+            Vertex vert = p.m_verts[v];
+            vert.m_pos[0] = 2.0f*(vert.m_pos[0]/512.0f) - 1.0f;
+            vert.m_pos[1] = 1.0f - (vert.m_pos[1]/512.0f)*2.0f;
+            vert.m_pos = vert.m_pos*vert.m_pos[3];
+            vert.m_pos = glm::inverse(c.viewMat())*glm::inverse(c.projMat())*vert.m_pos;
+            p.m_verts[v] = vert;
+        }
+    }
+}
+
+glm::vec4 Rasterizer::PixelToCamera(glm::vec4 v)
+{
+    v[0] = 2.0f*(v[0]/512.0f) - 1.0f;
+    v[1] = 1.0f - (v[1]/512.0f)*2.0f;
+    v = v*v[3];
+    v = glm::inverse(c.projMat())*v;
+    return v;
+}
+
 void Rasterizer::fillPolygon(QImage* img)
 {
-    Camera c;
     for(unsigned int i = 0; i<this->m_polygons.size(); i++)
     {
         Polygon p = m_polygons[i];
         std::cout << p.m_name.toStdString() << ": " <<
                      p.m_verts.size() <<", " <<
                      p.m_tris.size() << std::endl;
-
-        for(unsigned int v=0; v<p.m_verts.size(); v++)
-        {
-            Vertex vert = p.m_verts[v];
-            vert.m_pos = c.projMat()*c.viewMat()*vert.m_pos;
-            vert.m_pos = vert.m_pos/vert.m_pos[3];
-            vert.m_pos[0] = 0.5*(vert.m_pos[0]+1.0f)*512.0f;
-            vert.m_pos[1] = 0.5*(1.0f-vert.m_pos[1])*512.0f;
-
-            m_polygons[i].m_verts[v] = vert;
-            std::cout<<"Vertex: "<<vert.m_pos[0]<<", "<<vert.m_pos[1]<<", "<<vert.m_pos[2]<<std::endl;
-        }
         for(unsigned int j=0; j<p.m_tris.size(); j++)
         {
             fillTriangle(i, p.m_tris[j], img);
@@ -140,6 +181,7 @@ QImage Rasterizer::RenderScene()
     result.fill(qRgb(0.f, 0.f, 0.f));
     // TODO: Complete the various components of code that make up this function.
     // It should return the rasterized image of the current scene.
+    zdepth = std::vector(262144,FLT_MAX);
     fillPolygon(&result);
     // Make liberal use of helper functions; writing your rasterizer as one
     // long RenderScene function will make it (a) hard to debug and

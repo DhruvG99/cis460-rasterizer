@@ -20,6 +20,66 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
 {
     switch(e->key())
     {
+    case Qt::Key_W :
+        rasterizer.PixelToWorld();
+        rasterizer.c.translateZ(0.5f);
+        rasterizer.WorldToPixel();
+        break;
+    case Qt::Key_S :
+        rasterizer.PixelToWorld();
+        rasterizer.c.translateZ(-0.5f);
+        rasterizer.WorldToPixel();
+        break;
+    case Qt::Key_A :
+        rasterizer.PixelToWorld();
+        rasterizer.c.translateX(-0.5f);
+        rasterizer.WorldToPixel();
+        break;
+    case Qt::Key_D :
+        rasterizer.PixelToWorld();
+        rasterizer.c.translateX(0.5f);
+        rasterizer.WorldToPixel();
+        break;
+    case Qt::Key_Q :
+        rasterizer.PixelToWorld();
+        rasterizer.c.translateY(-0.5f);
+        rasterizer.WorldToPixel();
+        break;
+    case Qt::Key_E :
+        rasterizer.PixelToWorld();
+        rasterizer.c.translateY(0.5f);
+        rasterizer.WorldToPixel();
+        break;
+    case Qt::Key_Up :
+        rasterizer.PixelToWorld();
+        rasterizer.c.rotateX(-5.0f);
+        rasterizer.WorldToPixel();
+        break;
+    case Qt::Key_Down :
+        rasterizer.PixelToWorld();
+        rasterizer.c.rotateX(5.0f);
+        rasterizer.WorldToPixel();
+        break;
+    case Qt::Key_Left :
+        rasterizer.PixelToWorld();
+        rasterizer.c.rotateY(5.0f);
+        rasterizer.WorldToPixel();
+        break;
+    case Qt::Key_Right :
+        rasterizer.PixelToWorld();
+        rasterizer.c.rotateY(-5.0f);
+        rasterizer.WorldToPixel();
+        break;
+    case Qt::Key_Z :
+        rasterizer.PixelToWorld();
+        rasterizer.c.rotateZ(5.0f);
+        rasterizer.WorldToPixel();
+        break;
+    case Qt::Key_X :
+        rasterizer.PixelToWorld();
+        rasterizer.c.rotateZ(-5.0f);
+        rasterizer.WorldToPixel();
+        break;
     //The key shortcuts for the other menu commands were set in Qt's GUI
     //editor. This one was implemented as a key press event for illustration purposes.
     case Qt::Key_Escape : on_actionQuit_Esc_triggered();  break;
